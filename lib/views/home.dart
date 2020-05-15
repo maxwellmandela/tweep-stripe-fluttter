@@ -17,13 +17,7 @@ class _MyHomepageState extends State<MyHomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(_title), actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.power_settings_new),
-            color: Colors.white,
-            onPressed: null,
-          ),
-        ]),
+        appBar: AppBar(title: Text(_title)),
         body: content(context));
   }
 }

@@ -41,13 +41,30 @@ class JokesWidget extends StatefulWidget {
   _JokesWidgetState createState() => _JokesWidgetState();
 }
 
-class _JokesWidgetState extends State<JokesWidget> {
+class SingleJokeWidget extends StatefulWidget {
+  bool isFetchingJokes;
+  Function(bool) callback;
+  SingleJokeWidget(this.isFetchingJokes, this.callback);
+
+  @override
+  _SingleJokeWidgetState createState() => _SingleJokeWidgetState();
+}
+
+class _SingleJokeWidgetState extends State<SingleJokeWidget> {
   Future<Joke> futureJoke;
+  String setup;
+  String punchline;
+  bool hasData;
+  bool hasError;
 
   @override
   void initState() {
     super.initState();
     futureJoke = fetchJoke();
+    hasData = false;
+    hasError = false;
+    setup = "Waiting to happe";
+    punchline = "A bad bad joke";
   }
 
   @override
@@ -56,21 +73,23 @@ class _JokesWidgetState extends State<JokesWidget> {
       future: futureJoke,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Column(children: [
-            Text(snapshot.data.setup),
-            SizedBox(height: 10),
-            Text(snapshot.data.punchline),
-            SizedBox(height: 20),
-            RaisedButton(
-              onPressed: () {
-                setState(() {
-                  futureJoke = fetchJoke();
-                });
-              },
-              child: Text('Fetch Another!'),
-            ),
-          ]);
+          hasData = true;
+          setup = snapshot.data.setup;
+          punchline = snapshot.data.punchline;
         } else if (snapshot.hasError) {
+          hasError = snapshot.hasError;
+        }
+
+        if (hasData) {
+          widget.callback(false);
+
+          return Column(children: [
+            Text(setup),
+            SizedBox(height: 10),
+            Text(punchline),
+            SizedBox(height: 20)
+          ]);
+        } else if (hasError) {
           return Text("${snapshot.error}");
         }
 
@@ -78,5 +97,28 @@ class _JokesWidgetState extends State<JokesWidget> {
         return CircularProgressIndicator();
       },
     );
+  }
+}
+
+class _JokesWidgetState extends State<JokesWidget> {
+  bool isFetchingJokes = true;
+  String response = "Fetching!";
+
+  callback(status) {
+    setState(() {
+      isFetchingJokes = status;
+      response = isFetchingJokes ? "Fetching jokes" : "Fetch Another!";
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      new SingleJokeWidget(isFetchingJokes, callback),
+      RaisedButton(
+        onPressed: null,
+        child: Text(response),
+      )
+    ]);
   }
 }
