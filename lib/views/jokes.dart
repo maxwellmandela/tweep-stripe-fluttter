@@ -102,12 +102,12 @@ class _SingleJokeWidgetState extends State<SingleJokeWidget> {
 
 class _JokesWidgetState extends State<JokesWidget> {
   bool isFetchingJokes = true;
-  String response = "Fetching!";
+  String response = "Fetching";
 
   callback(status) {
     setState(() {
       isFetchingJokes = status;
-      response = isFetchingJokes ? "Fetching jokes" : "Fetch Another!";
+      response = isFetchingJokes ? "Fetching" : "Fetch Another!";
     });
   }
 
