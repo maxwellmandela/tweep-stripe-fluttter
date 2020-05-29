@@ -13,7 +13,7 @@ class TweetStripesWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                JokesWidget(),
+                JokeWidget(),
               ],
             )));
   }

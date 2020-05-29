@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
+import 'package:comedown/views/item.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -34,61 +34,64 @@ class Joke {
   }
 }
 
-class JokesWidget extends StatefulWidget {
-  JokesWidget({Key key}) : super(key: key);
+//---------------------------- JokeWidget ----------------------------
 
+class JokeWidget extends StatefulWidget {
   @override
-  _JokesWidgetState createState() => _JokesWidgetState();
+  _JokeWidgetState createState() => _JokeWidgetState();
 }
 
-class SingleJokeWidget extends StatefulWidget {
-  bool isFetchingJokes;
-  Function(bool) callback;
-  SingleJokeWidget(this.isFetchingJokes, this.callback);
+class _JokeWidgetState extends State<JokeWidget> {
+  bool _active = false;
 
-  @override
-  _SingleJokeWidgetState createState() => _SingleJokeWidgetState();
-}
-
-class _SingleJokeWidgetState extends State<SingleJokeWidget> {
   Future<Joke> futureJoke;
-  String setup;
-  String punchline;
-  bool hasData;
-  bool hasError;
+  String setup = "Not fetched yet";
+  String punchline = "Tap to fetch";
+  bool hasData = false;
+  bool hasError = false;
 
-  @override
-  void initState() {
-    super.initState();
-    futureJoke = fetchJoke();
-    hasData = false;
-    hasError = false;
-    setup = "Waiting to happe";
-    punchline = "A bad bad joke";
+  void _handleTapboxChanged(bool newValue) {
+    setState(() {
+      hasData = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    futureJoke = fetchJoke();
+
     return FutureBuilder<Joke>(
       future: futureJoke,
       builder: (context, snapshot) {
+        print("\nFETCHING..\n");
+        print(snapshot.data);
+        print("\n");
+
         if (snapshot.hasData) {
+          hasError = false;
           hasData = true;
-          setup = snapshot.data.setup;
-          punchline = snapshot.data.punchline;
         } else if (snapshot.hasError) {
-          hasError = snapshot.hasError;
+          // setState(() {
+          _active = false;
+          hasError = true;
+          // });
         }
 
         if (hasData) {
-          widget.callback(false);
+          // setState(() {
+          _active = true;
+          setup = snapshot.data.setup;
+          punchline = snapshot.data.punchline;
+          // });
 
-          return Column(children: [
-            Text(setup),
-            SizedBox(height: 10),
-            Text(punchline),
-            SizedBox(height: 20)
-          ]);
+          return Container(
+            child: SingleItem(
+              active: _active,
+              onChanged: _handleTapboxChanged,
+              setup: setup,
+              punchline: punchline,
+            ),
+          );
         } else if (hasError) {
           return Text("${snapshot.error}");
         }
@@ -97,28 +100,5 @@ class _SingleJokeWidgetState extends State<SingleJokeWidget> {
         return CircularProgressIndicator();
       },
     );
-  }
-}
-
-class _JokesWidgetState extends State<JokesWidget> {
-  bool isFetchingJokes = true;
-  String response = "Fetching";
-
-  callback(status) {
-    setState(() {
-      isFetchingJokes = status;
-      response = isFetchingJokes ? "Fetching" : "Fetch Another!";
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      new SingleJokeWidget(isFetchingJokes, callback),
-      RaisedButton(
-        onPressed: null,
-        child: Text(response),
-      )
-    ]);
   }
 }
