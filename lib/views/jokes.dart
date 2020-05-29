@@ -35,7 +35,6 @@ class Joke {
 }
 
 //---------------------------- JokeWidget ----------------------------
-
 class JokeWidget extends StatefulWidget {
   @override
   _JokeWidgetState createState() => _JokeWidgetState();
@@ -52,6 +51,7 @@ class _JokeWidgetState extends State<JokeWidget> {
 
   void _handleTapboxChanged(bool newValue) {
     setState(() {
+      _active = newValue;
       hasData = false;
     });
   }
@@ -66,23 +66,19 @@ class _JokeWidgetState extends State<JokeWidget> {
         print("\nFETCHING..\n");
         print(snapshot.data);
         print("\n");
+        print(_active);
 
         if (snapshot.hasData) {
-          hasError = false;
           hasData = true;
+          _active = true;
         } else if (snapshot.hasError) {
-          // setState(() {
           _active = false;
           hasError = true;
-          // });
         }
 
         if (hasData) {
-          // setState(() {
-          _active = true;
           setup = snapshot.data.setup;
           punchline = snapshot.data.punchline;
-          // });
 
           return Container(
             child: SingleItem(

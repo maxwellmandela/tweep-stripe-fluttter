@@ -1,12 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class SingleItem extends StatefulWidget {
   SingleItem(
       {Key key,
-      this.active: false,
+      this.active,
       this.setup,
       this.punchline,
       @required this.onChanged})
@@ -21,52 +18,51 @@ class SingleItem extends StatefulWidget {
 }
 
 class _SingleItemState extends State<SingleItem> {
-  bool _highlight = false;
-
-  void _handleTapDown(TapDownDetails details) {
-    setState(() {
-      _highlight = true;
-    });
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    setState(() {
-      _highlight = false;
-    });
-  }
-
-  void _handleTapCancel() {
-    setState(() {
-      _highlight = false;
-    });
-  }
-
   void _handleTap() {
-    widget.onChanged(!widget.active);
+    widget.onChanged(false);
+  }
+
+  Widget jokeContent() {
+    if (!widget.active) {
+      return Column(children: <Widget>[
+        CircularProgressIndicator(),
+      ]);
+    }
+
+    return Column(
+      children: <Widget>[
+        Text(
+          widget.setup,
+        ),
+        SizedBox(
+          height: 2,
+        ),
+        Text(
+          widget.punchline,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        FloatingActionButton(
+          child: Icon(
+            Icons.refresh,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            _handleTap();
+          },
+        )
+      ],
+    );
   }
 
   Widget build(BuildContext context) {
     // This example adds a green border on tap down.
     // On tap up, the square changes to the opposite state.
-    return GestureDetector(
-      onTapDown: _handleTapDown, // Handle the tap events in the order that
-      onTapUp: _handleTapUp, // they occur: down, up, tap, cancel
-      onTap: _handleTap,
-      onTapCancel: _handleTapCancel,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.95,
-        padding: EdgeInsets.all(15),
-        child: Text(widget.active ? widget.setup : widget.punchline),
-        decoration: BoxDecoration(
-          color: widget.active ? Colors.red[500] : Colors.grey[600],
-          border: _highlight
-              ? Border.all(
-                  color: Colors.red[300],
-                  width: 10.0,
-                )
-              : null,
-        ),
-      ),
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.95,
+      padding: EdgeInsets.all(15),
+      child: jokeContent(),
     );
   }
 }
