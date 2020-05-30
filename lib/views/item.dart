@@ -23,13 +23,8 @@ class _SingleItemState extends State<SingleItem> {
   }
 
   Widget jokeContent() {
-    if (!widget.active) {
-      return Column(children: <Widget>[
-        CircularProgressIndicator(),
-      ]);
-    }
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Text(
           widget.setup,
@@ -41,17 +36,48 @@ class _SingleItemState extends State<SingleItem> {
           widget.punchline,
         ),
         SizedBox(
-          height: 15,
+          height: 150,
         ),
-        FloatingActionButton(
-          child: Icon(
-            Icons.refresh,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            _handleTap();
-          },
-        )
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                RaisedButton(
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white,
+                  ),
+                  onPressed: null,
+                ),
+              ],
+            ),
+            Column(children: <Widget>[
+              FloatingActionButton(
+                child: Icon(
+                  Icons.refresh,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _handleTap();
+                },
+              )
+            ]),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                RaisedButton(
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                  ),
+                  onPressed: null,
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     );
   }

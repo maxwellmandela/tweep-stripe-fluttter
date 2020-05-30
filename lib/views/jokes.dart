@@ -56,6 +56,27 @@ class _JokeWidgetState extends State<JokeWidget> {
     });
   }
 
+  Widget displayError() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text("Sorry, there was a problem, please try again"),
+        SizedBox(
+          height: 10,
+        ),
+        FloatingActionButton(
+          child: Icon(
+            Icons.refresh,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            _handleTapboxChanged(false);
+          },
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     futureJoke = fetchJoke();
@@ -89,7 +110,8 @@ class _JokeWidgetState extends State<JokeWidget> {
             ),
           );
         } else if (hasError) {
-          return Text("${snapshot.error}");
+          print("${snapshot.error}");
+          return displayError();
         }
 
         // By default, show a loading spinner.

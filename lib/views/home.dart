@@ -17,8 +17,7 @@ class _MyHomepageState extends State<MyHomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(_title)),
-        body: content(context));
+        appBar: AppBar(title: Text(_title)), body: content(context));
   }
 }
 
@@ -35,7 +34,7 @@ class WelcomeWidget extends StatelessWidget {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => TweetStripesWidget()));
         },
-        color: Colors.deepPurpleAccent,
+        color: Colors.red[300],
         textColor: Colors.white,
       );
 
