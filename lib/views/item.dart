@@ -4,14 +4,14 @@ class SingleItem extends StatefulWidget {
   SingleItem(
       {Key key,
       this.active,
-      this.setup,
-      this.punchline,
+      this.tweet,
+      this.replies,
       @required this.onChanged})
       : super(key: key);
 
   final bool active;
-  final String setup;
-  final String punchline;
+  final List replies;
+  final Object tweet;
   final ValueChanged<bool> onChanged;
 
   _SingleItemState createState() => _SingleItemState();
@@ -23,20 +23,22 @@ class _SingleItemState extends State<SingleItem> {
   }
 
   Widget jokeContent() {
+    print(widget.tweet.toString());
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Text(
-          widget.setup,
+          "title",
         ),
         SizedBox(
-          height: 2,
+          height: 6,
         ),
         Text(
-          widget.punchline,
+          "Punchline",
         ),
         SizedBox(
-          height: 150,
+          height: 100,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -47,9 +49,12 @@ class _SingleItemState extends State<SingleItem> {
                 RaisedButton(
                   child: Icon(
                     Icons.arrow_back_ios,
-                    color: Colors.white,
+                    color: Colors.grey,
                   ),
-                  onPressed: null,
+                  color: Colors.blueAccent[300],
+                  onPressed: () {
+                    _handleTap();
+                  },
                 ),
               ],
             ),
@@ -72,7 +77,11 @@ class _SingleItemState extends State<SingleItem> {
                     Icons.arrow_forward_ios,
                     color: Colors.white,
                   ),
-                  onPressed: null,
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    _handleTap();
+                  },
                 ),
               ],
             ),

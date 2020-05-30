@@ -6,30 +6,39 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 Future<Joke> fetchJoke() async {
-  final response = await http
-      .get('https://official-joke-api.appspot.com/jokes/programming/random');
+  final response = await http.get('https://290b920a521f.ngrok.io/api/stripes');
 
   if (response.statusCode == 200) {
-    return Joke.fromJson(json.decode(response.body)[0]);
+    return Joke.fromJson(json.decode(response.body));
   } else {
-    throw Exception('Failed to load Joke');
+    throw Exception('Failed to load');
   }
 }
 
 class Joke {
-  final int id;
-  final String setup;
-  final String type;
-  final String punchline;
+  final Tweet tweet;
+  final List<Tweet> replies;
 
-  Joke({this.id, this.type, this.setup, this.punchline});
+  Joke({this.tweet, this.replies});
 
   factory Joke.fromJson(Map<String, dynamic> json) {
     return Joke(
-      id: json['id'],
-      type: json['type'],
-      setup: json['setup'],
-      punchline: json['punchline'],
+      tweet: json['tweet'],
+      replies: json['replies'].map((data) => Tweet.fromJson(data)).toList(),
+    );
+  }
+}
+
+class Tweet {
+  final String user;
+  final String text;
+
+  Tweet._({this.user, this.text});
+
+  factory Tweet.fromJson(Map<String, dynamic> json) {
+    return Tweet._(
+      user: json['user'],
+      text: json['text'],
     );
   }
 }
@@ -42,12 +51,11 @@ class JokeWidget extends StatefulWidget {
 
 class _JokeWidgetState extends State<JokeWidget> {
   bool _active = false;
-
-  Future<Joke> futureJoke;
-  String setup = "Not fetched yet";
-  String punchline = "Tap to fetch";
   bool hasData = false;
   bool hasError = false;
+  List<Tweet> replies;
+  Future<Joke> futureJoke;
+  Tweet tweet;
 
   void _handleTapboxChanged(bool newValue) {
     setState(() {
@@ -86,7 +94,6 @@ class _JokeWidgetState extends State<JokeWidget> {
       builder: (context, snapshot) {
         print("\nFETCHING..\n");
         print(snapshot.data);
-        print("\n");
         print(_active);
 
         if (snapshot.hasData) {
@@ -97,16 +104,20 @@ class _JokeWidgetState extends State<JokeWidget> {
           hasError = true;
         }
 
+        print(snapshot.data);
+
         if (hasData) {
-          setup = snapshot.data.setup;
-          punchline = snapshot.data.punchline;
+          tweet = snapshot.data.tweet;
+          replies = snapshot.data.replies;
+
+          print("Result: @${tweet.user}");
 
           return Container(
             child: SingleItem(
               active: _active,
               onChanged: _handleTapboxChanged,
-              setup: setup,
-              punchline: punchline,
+              tweet: tweet,
+              replies: replies,
             ),
           );
         } else if (hasError) {
