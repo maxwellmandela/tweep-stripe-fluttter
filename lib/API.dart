@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-const baseUrl = "https://290b920a521f.ngrok.io/api";
+const baseUrl = "https://704288777faa.ngrok.io/api";
 
 class API {
   static Future getUsers() {
