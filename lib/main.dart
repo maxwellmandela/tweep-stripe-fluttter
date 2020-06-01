@@ -24,42 +24,52 @@ class MyListScreen extends StatefulWidget {
 
 class _MyListScreenState extends State {
   var tweets = new List<Tweet>();
+  bool loading = true;
+  bool hasError = false;
 
-  _getUsers() {
-    API.getUsers().then((response) {
+  _getTweetStripes() {
+    // loader
+    setState(() {
+      loading = true;
+    });
+
+    API.getNewStripes().then((response) {
       setState(() {
-        Iterable list = json.decode(response.body)['replies'];
+        loading = false;
+        var res = json.decode(response.body);
+        Iterable list = res['tweets'];
         tweets = list.map((model) => Tweet.fromJson(model)).toList();
+      });
+    }).catchError((onError) {
+      setState(() {
+        loading = false;
+        hasError = true;
       });
     });
   }
 
   initState() {
     super.initState();
-    _getUsers();
+    _getTweetStripes();
   }
 
   dispose() {
     super.dispose();
   }
 
-  Widget tweetHeader(String img, String user) {
+  Widget tweetHeader(String img) {
     return Row(children: [
       Column(
         children: [
           Container(
-              width: 40.0,
-              height: 40.0,
-              decoration: new BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: new DecorationImage(
-                      fit: BoxFit.fill, image: new NetworkImage(img))))
-        ],
-      ),
-      SizedBox(width: 10),
-      Column(
-        children: [
-          Text("@${user}"),
+            width: 45.0,
+            height: 45.0,
+            decoration: new BoxDecoration(
+              shape: BoxShape.circle,
+              image: new DecorationImage(
+                  fit: BoxFit.fill, image: new NetworkImage(img)),
+            ),
+          )
         ],
       )
     ]);
@@ -67,24 +77,72 @@ class _MyListScreenState extends State {
 
   @override
   build(context) {
+    if (loading) {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("New Stripes!"),
+          ),
+          body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (hasError) {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("New Stripes!"),
+          ),
+          body: Center(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text("Sorry, an error occured from our side, retry!"),
+              RaisedButton(
+                child: Text('Retry'),
+                onPressed: () {
+                  _getTweetStripes();
+                },
+              )
+            ],
+          )));
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text("New Stripes!"),
         ),
-        body: ListView.builder(
-          // padding: EdgeInsets.all(15),
-          itemCount: tweets.length,
-          itemBuilder: (context, index) {
-            return Card(
-              child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(children: <Widget>[
-                    tweetHeader(tweets[index].avi, tweets[index].user),
-                    SizedBox(height: 5),
-                    Text(tweets[index].text),
-                  ])),
-            );
-          },
-        ));
+        body: Stack(children: <Widget>[
+          ListView.builder(
+            itemCount: tweets.length,
+            itemBuilder: (context, index) {
+              return Card(
+                  color: tweets[index].isParent
+                      ? Colors.red[50]
+                      : Colors.grey[100],
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(children: [
+                        Column(children: [
+                          tweetHeader(tweets[index].avi),
+                        ]),
+                        SizedBox(width: 10),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.75,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("@${tweets[index].user}"),
+                                    SizedBox(height: 3),
+                                    Text(tweets[index].text),
+                                  ],
+                                ),
+                              ),
+                            ]),
+                      ])));
+            },
+          )
+        ]));
   }
 }
